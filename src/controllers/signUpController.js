@@ -6,6 +6,16 @@ export async function signUp(req, res) {
   const passwordHash = bcrypt.hashSync(password, 10);
 
   try {
+    const listUsers = await connection.query(
+      `
+    SELECT * FROM users
+    WHERE email=$1`,
+      [email]
+    );
+    if (listUsers.rowCount > 0) {
+      return res.status(409).send("Email já cadastrado!");
+    }
+
     await connection.query(
       `
     INSERT INTO
