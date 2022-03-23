@@ -10,8 +10,11 @@ export async function signIn(req, res) {
       `SELECT * FROM users WHERE email=$1`,
       [email]
     );
-
     const user = users[0];
+
+    if (user === undefined) {
+      return res.sendStatus(401);
+    }
     const passwordCheck = bcrypt.compareSync(password, user.password);
 
     if (users.length === 0 || !passwordCheck) {
