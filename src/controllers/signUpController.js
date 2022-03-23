@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { connection } from "../db";
+import { connection } from "../db.js";
 
 export async function signUp(req, res) {
   const { email, password, username, pictureUrl } = req.body;
