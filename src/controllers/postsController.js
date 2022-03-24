@@ -1,4 +1,5 @@
 import { query } from "express";
+import urlMetadata from "url-metadata";
 import { connection } from "../db.js";
 
 async function postPublication(req, res) {
@@ -36,12 +37,25 @@ async function getPublications(req, res) {
 		JOIN users un ON un.id=p."userId"
 		ORDER BY id DESC LIMIT 20
 		`);
-    console.log(postList);
+
     if (postList.length === 0) {
       return res.status(200).send("There are no posts yet");
     }
 
-    res.status(200).send(postList);
+    //talvez adicionar um mappin pra mudar o valor de link
+    let detailedList = [];
+
+    for (let i = 0; i < postList.length; i++) {
+      let link = postList[i].link;
+      let info = await urlMetadata(link);
+      detailedList.push({
+        ...postList[i],
+        linkName: info.title,
+        linkBanner: info.image,
+        linkDesc: info.description,
+      });
+    }
+    res.status(200).send(detailedList);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
