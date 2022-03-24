@@ -1,4 +1,3 @@
-import { query } from "express";
 import urlMetadata from "url-metadata";
 import { connection } from "../db.js";
 
@@ -42,7 +41,6 @@ async function getPublications(req, res) {
       return res.status(200).send("There are no posts yet");
     }
 
-    //talvez adicionar um mappin pra mudar o valor de link
     let detailedList = [];
 
     for (let i = 0; i < postList.length; i++) {
