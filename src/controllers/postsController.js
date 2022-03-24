@@ -26,12 +26,20 @@ async function postPublication(req, res) {
 }
 
 async function getPublications(req, res) {
-  //é pra pegar todos os posts sem distinção
-  console.log("chegou aqui");
   try {
     let { rows: postList } = await connection.query(`
-		SELECT * FROM posts ORDER BY id DESC LIMIT 20
+		SELECT p.id,p.link, p.description,
+		up."pictureUrl" AS "userPic",
+		un.username
+		FROM posts p
+		JOIN users up ON up.id=p."userId"
+		JOIN users un ON un.id=p."userId"
+		ORDER BY id DESC LIMIT 20
 		`);
+    console.log(postList);
+    if (postList.length === 0) {
+      return res.status(200).send("There are no posts yet");
+    }
 
     res.status(200).send(postList);
   } catch (error) {
