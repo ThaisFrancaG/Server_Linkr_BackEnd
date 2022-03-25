@@ -18,3 +18,9 @@ CREATE TABLE posts (
 	description TEXT NULL,
 	"userId" INTEGER NOT NULL REFERENCES users(id)
 );
+
+CREATE TABLE likes (
+	id SERIAL PRIMARY KEY NOT NULL,
+	"postId" INTEGER NOT NULL REFERENCES posts(id),
+	"likedBy" INTEGER NOT NULL REFERENCES users(id)
+);
