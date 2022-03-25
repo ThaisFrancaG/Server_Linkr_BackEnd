@@ -1,5 +1,4 @@
 import { connection } from "../db.js";
-import findHashtags from "find-hashtags";
 
 export default async function getHashtagPosts(req, res) {
   const { hashtag } = req.params;
@@ -8,24 +7,17 @@ export default async function getHashtagPosts(req, res) {
     const result = await connection.query(
       `
     SELECT * FROM posts
-      JOIN hashtagPosts ON "hashtagPosts"."postId"=posts.id
+      JOIN "hashtagPosts" ON "hashtagPosts"."postId"=posts.id
       JOIN hashtags ON hashtags.id="hashtagPosts"."hashtagId"
-    WHERE `,
+    WHERE hashtags.tag=$1`,
       [hashtag]
     );
+    if (result.rowCount === 0) {
+      return res.sendStatus(404);
+    }
 
-    return res.status(200).send(result.rows);
+    res.status(200).send(result.rows);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send(error.message);
   }
 }
-
-// export default async function createHashtags(req, res) {
-
-//   try {
-
-//     return res.sendStatus(200);
-//   } catch (error) {
-//     return res.status(500).send(error)
-//   }
-// }
