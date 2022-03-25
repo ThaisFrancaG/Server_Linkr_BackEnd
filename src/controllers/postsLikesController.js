@@ -2,11 +2,8 @@ import { connection } from "../db.js";
 
 async function toggleLike(req, res) {
   const { token, postId, liked } = req.body;
-  console.log(liked);
-  try {
-    //ver se a sessão está valida, e já pegar o id do boy
-    console.log(token);
 
+  try {
     const { rows: checkSession } = await connection.query(
       `SELECT*FROM sessions WHERE token=$1
       `,
@@ -19,8 +16,6 @@ async function toggleLike(req, res) {
     console.log(userId);
 
     if (liked === true) {
-      console.log("tem que descutir");
-
       await connection.query(
         `DELETE FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
         [postId, userId]
@@ -28,7 +23,6 @@ async function toggleLike(req, res) {
     }
 
     if (liked === false) {
-      console.log("tem que curtir");
       await connection.query(
         `INSERT INTO likes ("postId","likedById") VALUES ($1,$2)`,
         [postId, userId]
@@ -41,4 +35,26 @@ async function toggleLike(req, res) {
   }
 }
 
-export { toggleLike };
+async function getLikes(req, res) {
+  console.log("fui chamado");
+  const authorization = req.headers.authorization;
+  const token = authorization?.replace("Bearer", "");
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  const { rows: postLikes } = await connection.query(
+    `SELECT COUNT("postId"),
+     posts.id FROM likes 
+     JOIN posts ON likes."postId"=posts.id 
+     GROUP BY posts.id;`
+  );
+
+  console.log(postLikes);
+  try {
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+export { toggleLike, getLikes };
