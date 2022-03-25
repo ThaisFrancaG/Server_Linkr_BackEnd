@@ -26,6 +26,16 @@ async function getUserData(req, res) {
     console.error(error);
     return res.status(500).send(error);
   }
+};
+
+async function getUsers(req,res) {
+  try {
+    const { rows : users } = await connection.query(`SELECT id, username, "pictureUrl" FROM users `);
+
+    return res.send(users)
+  }catch(error) {
+    return res.status(500).send(error);
+  }
 }
 
-export { getUserData };
+export { getUserData, getUsers };
