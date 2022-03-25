@@ -11,21 +11,6 @@ async function postPublication(req, res) {
     ]);
     if (!user.rowCount) return res.sendStatus(404);
 
-    const { rows: listHashtags } = await connection.query(
-      `SELECT description FROM posts`
-    );
-
-    const hashtags = findHashtags(listHashtags[0].description);
-
-    hashtags.forEach((tag) => {
-      connection.query(
-        `
-				INSERT INTO hashtags (tag)
-				VALUES ($1)`,
-        [tag]
-      );
-    });
-
     await connection.query(
       `
 			INSERT INTO posts (link, description, "userId")
@@ -33,6 +18,31 @@ async function postPublication(req, res) {
 		`,
       [link, description, id]
     );
+
+    const { rows: listPosts } = await connection.query(`SELECT * FROM posts`);
+
+    const hashtags = findHashtags(listPosts[listPosts.length - 1].description);
+
+    hashtags.forEach(async (tag) => {
+      await connection.query(
+        `
+				INSERT INTO hashtags (tag)
+				VALUES ($1)`,
+        [tag]
+      );
+
+      const { rows: tagId } = await connection.query(
+        `SELECT id FROM hashtags WHERE tag=$1`,
+        [tag]
+      );
+
+      await connection.query(
+        `
+			INSERT INTO "hashtagPosts" ("hashtagId", "postId")
+			VALUES ($1, $2)`,
+        [tagId[tagId.length - 1].id, listPosts[listPosts.length - 1].id]
+      );
+    });
 
     return res.sendStatus(201);
   } catch (error) {

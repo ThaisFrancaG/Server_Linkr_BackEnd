@@ -5,6 +5,6 @@ import { postSchema } from "../schemas/postSchema.js";
 
 const postsRouter = Router();
 
-postsRouter.post('/publish', validateSchema(postSchema), postPublication);
+postsRouter.post("/publish", validateSchema(postSchema), postPublication);
 
 export default postsRouter;

@@ -23,13 +23,8 @@ export default async function getHashtagPosts(req, res) {
 // export default async function createHashtags(req, res) {
 
 //   try {
-//     const { row: listHashtags} = await connection.query(`
-//     SELECT description FROM posts`);
 
-//     let hashtags = listHashtags.map((item) => findHashtags(item))
-//     console.log(hashtags);
-//     console.log(listHashtags);
-//     res.sendStatus(200);
+//     return res.sendStatus(200);
 //   } catch (error) {
 //     return res.status(500).send(error)
 //   }
