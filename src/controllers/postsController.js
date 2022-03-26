@@ -105,6 +105,7 @@ async function getUserPosts(req, res) {
 			JOIN users up ON up.id=p."userId"
 			JOIN users un ON un.id=p."userId"
 			WHERE up.id = $1
+      ORDER BY id DESC
 		`,
       [userData.id]
     );
@@ -120,6 +121,10 @@ async function getUserPosts(req, res) {
         linkBanner: info.image,
         linkDesc: info.description,
       });
+    };
+
+    if(!detailedList.length) {
+      detailedList.push({username:userData.username})
     }
 
     return res.status(200).send(detailedList);
