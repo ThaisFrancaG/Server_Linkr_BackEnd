@@ -26,15 +26,31 @@ async function postPublication(req, res) {
 }
 
 async function getPublications(req, res) {
+  const authorization = req.headers.authorization;
+  const token = authorization?.replace("Bearer", "");
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  const { rows: checkSession } = await connection.query(
+    `SELECT * FROM sessions WHERE token=$1
+      `,
+    [token.slice(1, token.length)]
+  );
+
+  const userId = checkSession[0].userId;
+
   try {
     let { rows: postList } = await connection.query(`
-		SELECT p.id,p.link, p.description, p."userId",
+	  SELECT
+	  (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
+	  p.id,p.link, p.description, p."userId",
 		up."pictureUrl" AS "userPic",
 		un.username
 		FROM posts p
 		JOIN users up ON up.id=p."userId"
 		JOIN users un ON un.id=p."userId"
-		ORDER BY id DESC LIMIT 20
+		ORDER BY id DESC LIMIT 5
 		`);
 
     if (postList.length === 0) {
@@ -44,6 +60,12 @@ async function getPublications(req, res) {
     let detailedList = [];
 
     for (let i = 0; i < postList.length; i++) {
+      console.log(postList[i].id);
+      const { rows: checkLiked } = await connection.query(
+        `SELECT*FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
+        [postList[i].id, userId]
+      );
+      console.log(checkLiked);
       let link = postList[i].link;
       let info = await urlMetadata(link);
       detailedList.push({
@@ -51,6 +73,7 @@ async function getPublications(req, res) {
         linkName: info.title,
         linkBanner: info.image,
         linkDesc: info.description,
+        likedByUser: checkLiked.length > 0 ? true : false,
       });
     }
     res.status(200).send(detailedList);
@@ -58,17 +81,20 @@ async function getPublications(req, res) {
     console.log(error);
     res.sendStatus(500);
   }
-};
+}
 
-async function getUserPosts (req,res) {
-	const { id } = req.params;
-	if(isNaN(Number(id))) return res.sendStatus(400)
-	try {
-		const user = await connection.query(`SELECT * FROM users WHERE id = $1`, [id]);
-		if (!user.rowCount) return res.sendStatus(404)
-		const userData = user.rows[0];
+async function getUserPosts(req, res) {
+  const { id } = req.params;
+  if (isNaN(Number(id))) return res.sendStatus(400);
+  try {
+    const user = await connection.query(`SELECT * FROM users WHERE id = $1`, [
+      id,
+    ]);
+    if (!user.rowCount) return res.sendStatus(404);
+    const userData = user.rows[0];
 
-		const {rows: posts} = await connection.query(`
+    const { rows: posts } = await connection.query(
+      `
 			SELECT p.id,p.link, p.description, p."userId",
 			up."pictureUrl" AS "userPic",
 			un.username
@@ -76,25 +102,27 @@ async function getUserPosts (req,res) {
 			JOIN users up ON up.id=p."userId"
 			JOIN users un ON un.id=p."userId"
 			WHERE up.id = $1
-		`,[userData.id]);
+		`,
+      [userData.id]
+    );
 
-		let detailedList = [];
+    let detailedList = [];
 
-		for (let i = 0; i < posts.length; i++) {
-			let link = posts[i].link;
-			let info = await urlMetadata(link);
-			detailedList.push({
-				...posts[i],
-				linkName: info.title,
-				linkBanner: info.image,
-				linkDesc: info.description,
-			});
-		}
+    for (let i = 0; i < posts.length; i++) {
+      let link = posts[i].link;
+      let info = await urlMetadata(link);
+      detailedList.push({
+        ...posts[i],
+        linkName: info.title,
+        linkBanner: info.image,
+        linkDesc: info.description,
+      });
+    }
 
-		return res.status(200).send(detailedList);
-	}catch (error){
-		return res.status(500).send(error)
-	}
+    return res.status(200).send(detailedList);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
 }
 
 export { postPublication, getPublications, getUserPosts };

@@ -1,7 +1,7 @@
 import { connection } from "../db.js";
 
 async function toggleLike(req, res) {
-  const { token, postId, liked } = req.body;
+  const { token, postId } = req.body;
 
   try {
     const { rows: checkSession } = await connection.query(
@@ -15,14 +15,19 @@ async function toggleLike(req, res) {
     const userId = checkSession[0].userId;
     console.log(userId);
 
-    if (liked === true) {
+    const { rows: liked } = await connection.query(
+      `SELECT*FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
+      [postId, userId]
+    );
+
+    if (liked.length > 0) {
       await connection.query(
         `DELETE FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
         [postId, userId]
       );
     }
 
-    if (liked === false) {
+    if (liked.length === 0) {
       await connection.query(
         `INSERT INTO likes ("postId","likedById") VALUES ($1,$2)`,
         [postId, userId]
@@ -36,7 +41,6 @@ async function toggleLike(req, res) {
 }
 
 async function getLikes(req, res) {
-  console.log("fui chamado");
   const authorization = req.headers.authorization;
   const token = authorization?.replace("Bearer", "");
   if (!token) {
@@ -50,7 +54,6 @@ async function getLikes(req, res) {
      GROUP BY posts.id;`
   );
 
-  console.log(postLikes);
   try {
   } catch (error) {
     console.log(error);
