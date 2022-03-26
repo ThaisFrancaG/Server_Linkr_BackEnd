@@ -13,7 +13,6 @@ async function toggleLike(req, res) {
       return res.sendStatus(401);
     }
     const userId = checkSession[0].userId;
-    console.log(userId);
 
     const { rows: liked } = await connection.query(
       `SELECT*FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
@@ -33,6 +32,7 @@ async function toggleLike(req, res) {
         [postId, userId]
       );
     }
+
     res.sendStatus(200);
   } catch (error) {
     console.log(error);
@@ -40,24 +40,4 @@ async function toggleLike(req, res) {
   }
 }
 
-async function getLikes(req, res) {
-  const authorization = req.headers.authorization;
-  const token = authorization?.replace("Bearer", "");
-  if (!token) {
-    return res.sendStatus(401);
-  }
-
-  const { rows: postLikes } = await connection.query(
-    `SELECT COUNT("postId"),
-     posts.id FROM likes 
-     JOIN posts ON likes."postId"=posts.id 
-     GROUP BY posts.id;`
-  );
-
-  try {
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
-  }
-}
-export { toggleLike, getLikes };
+export { toggleLike };

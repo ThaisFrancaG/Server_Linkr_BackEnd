@@ -50,7 +50,7 @@ async function getPublications(req, res) {
 		FROM posts p
 		JOIN users up ON up.id=p."userId"
 		JOIN users un ON un.id=p."userId"
-		ORDER BY id DESC LIMIT 5
+		ORDER BY id DESC LIMIT 20
 		`);
 
     if (postList.length === 0) {
@@ -60,12 +60,11 @@ async function getPublications(req, res) {
     let detailedList = [];
 
     for (let i = 0; i < postList.length; i++) {
-      console.log(postList[i].id);
       const { rows: checkLiked } = await connection.query(
         `SELECT*FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
         [postList[i].id, userId]
       );
-      console.log(checkLiked);
+
       let link = postList[i].link;
       let info = await urlMetadata(link);
       detailedList.push({
