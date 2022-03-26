@@ -29,8 +29,12 @@ async function getUserData(req, res) {
 };
 
 async function getUsers(req,res) {
+  const { name } = req.query;
   try {
-    const { rows : users } = await connection.query(`SELECT id, username, "pictureUrl" FROM users `);
+    const { rows : users } = await connection.query(`
+      SELECT id, username, "pictureUrl" 
+      FROM users 
+      WHERE username LIKE $1`, [`${name}%`]);
 
     return res.send(users)
   }catch(error) {

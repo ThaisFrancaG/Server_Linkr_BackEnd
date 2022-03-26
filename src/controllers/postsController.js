@@ -1,5 +1,6 @@
 import urlMetadata from "url-metadata";
 import { connection } from "../db.js";
+import findHashtags from "find-hashtags";
 
 async function postPublication(req, res) {
   const { link, description, id } = req.body;
@@ -18,6 +19,31 @@ async function postPublication(req, res) {
 		`,
       [link, description, id]
     );
+
+    const { rows: listPosts } = await connection.query(`SELECT * FROM posts`);
+
+    const hashtags = findHashtags(listPosts[listPosts.length - 1].description);
+
+    hashtags.forEach(async (tag) => {
+      await connection.query(
+        `
+				INSERT INTO hashtags (tag)
+				VALUES ($1)`,
+        [tag]
+      );
+
+      const { rows: tagId } = await connection.query(
+        `SELECT id FROM hashtags WHERE tag=$1`,
+        [tag]
+      );
+
+      await connection.query(
+        `
+			INSERT INTO "hashtagPosts" ("hashtagId", "postId")
+			VALUES ($1, $2)`,
+        [tagId[tagId.length - 1].id, listPosts[listPosts.length - 1].id]
+      );
+    });
 
     return res.sendStatus(201);
   } catch (error) {
@@ -101,6 +127,9 @@ async function getUserPosts(req, res) {
 			JOIN users up ON up.id=p."userId"
 			JOIN users un ON un.id=p."userId"
 			WHERE up.id = $1
+
+      ORDER BY id DESC
+
 		`,
       [userData.id]
     );
@@ -116,6 +145,10 @@ async function getUserPosts(req, res) {
         linkBanner: info.image,
         linkDesc: info.description,
       });
+    };
+
+    if(!detailedList.length) {
+      detailedList.push({username:userData.username})
     }
 
     return res.status(200).send(detailedList);

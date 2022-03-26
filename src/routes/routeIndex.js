@@ -1,4 +1,5 @@
 import { Router } from "express";
+import hashtagRouter from "./hashtagRouter.js";
 import logOutRouter from "./logOutRoute.js";
 import postLikesRouter from "./postLikesRouter.js";
 import postsRouter from "./postsRoute.js";
@@ -12,5 +13,10 @@ router.use(signUpRouter);
 router.use(logOutRouter);
 router.use(userRouter);
 router.use(postsRouter);
+
 router.use(postLikesRouter);
+
+router.use(hashtagRouter);
+
+
 export default router;
