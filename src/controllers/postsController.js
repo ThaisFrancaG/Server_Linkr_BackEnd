@@ -68,9 +68,7 @@ async function getPublications(req, res) {
 
   try {
     let { rows: postList } = await connection.query(`
-	  SELECT
-	  (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
-	  p.id,p.link, p.description, p."userId",
+		SELECT p.id,p.link, p.description, p."userId",
 		up."pictureUrl" AS "userPic",
 		un.username
 		FROM posts p
@@ -86,11 +84,6 @@ async function getPublications(req, res) {
     let detailedList = [];
 
     for (let i = 0; i < postList.length; i++) {
-      const { rows: checkLiked } = await connection.query(
-        `SELECT*FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
-        [postList[i].id, userId]
-      );
-
       let link = postList[i].link;
       let info = await urlMetadata(link);
       detailedList.push({
@@ -98,7 +91,6 @@ async function getPublications(req, res) {
         linkName: info.title,
         linkBanner: info.image,
         linkDesc: info.description,
-        likedByUser: checkLiked.length > 0 ? true : false,
       });
     }
     res.status(200).send(detailedList);
@@ -135,9 +127,6 @@ async function getUserPosts(req, res) {
 			JOIN users up ON up.id=p."userId"
 			JOIN users un ON un.id=p."userId"
 			WHERE up.id = $1
-
-      ORDER BY id DESC
-
 		`,
       [userData.id]
     );
@@ -153,42 +142,43 @@ async function getUserPosts(req, res) {
         linkBanner: info.image,
         linkDesc: info.description,
       });
-    };
-
-    if(!detailedList.length) {
-      detailedList.push({username:userData.username})
     }
 
     return res.status(200).send(detailedList);
   } catch (error) {
     return res.status(500).send(error);
   }
-};
+}
 
-async function updatePosts (req,res) {
-  const { link, description, id} = req.body;
+async function updatePosts(req, res) {
+  const { link, description, id } = req.body;
   const auth = req.headers.authorization;
   const token = auth?.replace("Bearer ", "");
-  
+
   try {
-    const session = await connection.query(`
+    const session = await connection.query(
+      `
       SELECT s.* 
       FROM sessions s 
       JOIN users u ON u.id = s."userId"
-      WHERE s.token = $1`, [token]);
-    if(!session.rowCount) return res.sendStatus(401)
+      WHERE s.token = $1`,
+      [token]
+    );
+    if (!session.rowCount) return res.sendStatus(401);
 
-    await connection.query(`
+    await connection.query(
+      `
       UPDATE posts
       SET link = $1, description = $2
       WHERE id = $3
-    `,[link, description, id]);
+    `,
+      [link, description, id]
+    );
 
-
-    return res.sendStatus(201)
-  }catch(error) {
-    return res.status(500).send(error)
+    return res.sendStatus(201);
+  } catch (error) {
+    return res.status(500).send(error);
   }
-};
+}
 
 export { postPublication, getPublications, getUserPosts, updatePosts };
