@@ -21,3 +21,23 @@ export default async function getHashtagPosts(req, res) {
     return res.status(500).send(error.message);
   }
 }
+
+export async function getHashtags(req, res) {
+  try {
+    const { rows: hashtag } = await connection.query(`
+    SELECT 
+      hashtags.*,
+      "hashtagPosts"."hashtagId" AS "hashtagId",
+    COUNT("hashtagPosts"."hashtagId") AS "hashtagCount"
+    FROM hashtags
+      JOIN "hashtagPosts" ON "hashtagPosts"."hashtagId"=hashtags.id
+    GROUP BY "hashtagPosts"."hashtagId", hashtags.id
+    ORDER BY "hashtagCount" DESC
+      LIMIT 10
+`);
+    console.log(hashtag);
+    res.status(200).send(hashtag);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
