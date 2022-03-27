@@ -40,4 +40,27 @@ async function toggleLike(req, res) {
   }
 }
 
-export { toggleLike };
+async function getWhoLiked(req, res) {
+  const authorization = req.headers.authorization;
+  const token = authorization?.replace("Bearer ", "");
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  try {
+    let { rows: likesList } = await connection.query(`
+	  SELECT
+    l."postId",
+	  users.username, users.id
+		FROM likes l
+		JOIN users ON users.id=l."likedById"
+		ORDER BY id DESC LIMIT 20
+		`);
+    res.status(200).send(likesList);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export { toggleLike, getWhoLiked };

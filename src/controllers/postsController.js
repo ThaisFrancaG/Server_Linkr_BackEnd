@@ -153,42 +153,47 @@ async function getUserPosts(req, res) {
         linkBanner: info.image,
         linkDesc: info.description,
       });
-    };
+    }
 
-    if(!detailedList.length) {
-      detailedList.push({username:userData.username})
+    if (!detailedList.length) {
+      detailedList.push({ username: userData.username });
     }
 
     return res.status(200).send(detailedList);
   } catch (error) {
     return res.status(500).send(error);
   }
-};
+}
 
-async function updatePosts (req,res) {
-  const { link, description, id} = req.body;
+async function updatePosts(req, res) {
+  const { link, description, id } = req.body;
   const auth = req.headers.authorization;
   const token = auth?.replace("Bearer ", "");
-  
+
   try {
-    const session = await connection.query(`
+    const session = await connection.query(
+      `
       SELECT s.* 
       FROM sessions s 
       JOIN users u ON u.id = s."userId"
-      WHERE s.token = $1`, [token]);
-    if(!session.rowCount) return res.sendStatus(401)
+      WHERE s.token = $1`,
+      [token]
+    );
+    if (!session.rowCount) return res.sendStatus(401);
 
-    await connection.query(`
+    await connection.query(
+      `
       UPDATE posts
       SET link = $1, description = $2
       WHERE id = $3
-    `,[link, description, id]);
+    `,
+      [link, description, id]
+    );
 
-
-    return res.sendStatus(201)
-  }catch(error) {
-    return res.status(500).send(error)
+    return res.sendStatus(201);
+  } catch (error) {
+    return res.status(500).send(error);
   }
-};
+}
 
 export { postPublication, getPublications, getUserPosts, updatePosts };
