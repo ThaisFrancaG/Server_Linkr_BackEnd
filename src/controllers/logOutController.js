@@ -1,9 +1,12 @@
 import { connection } from "../db.js";
 
 export default async function logOut(req, res) {
-  const { token } = req.body;
+  const auth = req.headers.authorization;
+  const token = auth?.replace("Bearer ", "");
 
+  if (!token) return res.sendStatus(400)
   try {
+
     await connection.query(
       `
 			DELETE FROM sessions

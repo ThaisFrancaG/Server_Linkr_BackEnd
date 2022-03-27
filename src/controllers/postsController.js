@@ -53,7 +53,7 @@ async function postPublication(req, res) {
 
 async function getPublications(req, res) {
   const authorization = req.headers.authorization;
-  const token = authorization?.replace("Bearer", "");
+  const token = authorization?.replace("Bearer ", "");
   if (!token) {
     return res.sendStatus(401);
   }
@@ -61,7 +61,7 @@ async function getPublications(req, res) {
   const { rows: checkSession } = await connection.query(
     `SELECT * FROM sessions WHERE token=$1
       `,
-    [token.slice(1, token.length)]
+    [token]
   );
 
   const userId = checkSession[0].userId;
@@ -110,8 +110,16 @@ async function getPublications(req, res) {
 
 async function getUserPosts(req, res) {
   const { id } = req.params;
+  const auth = req.headers.authorization;
+  const token = auth?.replace("Bearer ", "");
   if (isNaN(Number(id))) return res.sendStatus(400);
   try {
+    const session = await connection.query(
+      `SELECT * FROM sessions WHERE token = $1`,
+      [token]
+    );
+    if (!session.rowCount) return res.sendStatus(401);
+
     const user = await connection.query(`SELECT * FROM users WHERE id = $1`, [
       id,
     ]);
@@ -155,6 +163,32 @@ async function getUserPosts(req, res) {
   } catch (error) {
     return res.status(500).send(error);
   }
-}
+};
 
-export { postPublication, getPublications, getUserPosts };
+async function updatePosts (req,res) {
+  const { link, description, id} = req.body;
+  const auth = req.headers.authorization;
+  const token = auth?.replace("Bearer ", "");
+  
+  try {
+    const session = await connection.query(`
+      SELECT s.* 
+      FROM sessions s 
+      JOIN users u ON u.id = s."userId"
+      WHERE s.token = $1`, [token]);
+    if(!session.rowCount) return res.sendStatus(401)
+
+    await connection.query(`
+      UPDATE posts
+      SET link = $1, description = $2
+      WHERE id = $3
+    `,[link, description, id]);
+
+
+    return res.sendStatus(201)
+  }catch(error) {
+    return res.status(500).send(error)
+  }
+};
+
+export { postPublication, getPublications, getUserPosts, updatePosts };
