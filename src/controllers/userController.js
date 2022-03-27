@@ -1,15 +1,16 @@
 import { connection } from "../db.js";
 
 async function getUserData(req, res) {
-  const { token } = req.params;
+  const auth = req.headers.authorization;
+  const token = auth?.replace("Bearer ", "");
 
-  if (!token) return res.sendStatus(400);
+  if (!token) return res.sendStatus(400)
   try {
     const session = await connection.query(
       `SELECT * FROM sessions WHERE token = $1`,
       [token]
     );
-    if (!session.rowCount) return res.sendStatus(404);
+    if (!session.rowCount) return res.sendStatus(401);
 
     const user = await connection.query(
       `
@@ -30,7 +31,18 @@ async function getUserData(req, res) {
 
 async function getUsers(req,res) {
   const { name } = req.query;
+  const auth = req.headers.authorization;
+  const token = auth?.replace("Bearer ", "");
+
+  if (!token) return res.sendStatus(400)
+
   try {
+    const session = await connection.query(
+      `SELECT * FROM sessions WHERE token = $1`,
+      [token]
+    );
+    if (!session.rowCount) return res.sendStatus(401);
+
     const { rows : users } = await connection.query(`
       SELECT id, username, "pictureUrl" 
       FROM users 

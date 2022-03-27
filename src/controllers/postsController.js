@@ -110,8 +110,16 @@ async function getPublications(req, res) {
 
 async function getUserPosts(req, res) {
   const { id } = req.params;
+  const auth = req.headers.authorization;
+  const token = auth?.replace("Bearer ", "");
   if (isNaN(Number(id))) return res.sendStatus(400);
   try {
+    const session = await connection.query(
+      `SELECT * FROM sessions WHERE token = $1`,
+      [token]
+    );
+    if (!session.rowCount) return res.sendStatus(401);
+
     const user = await connection.query(`SELECT * FROM users WHERE id = $1`, [
       id,
     ]);
@@ -160,8 +168,8 @@ async function getUserPosts(req, res) {
 async function updatePosts (req,res) {
   const { link, description, id} = req.body;
   const auth = req.headers.authorization;
-  const token = auth?.replace("Bearer", "");
-
+  const token = auth?.replace("Bearer ", "");
+  
   try {
     const session = await connection.query(`
       SELECT s.* 
