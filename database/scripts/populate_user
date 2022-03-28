@@ -1,0 +1,30 @@
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Liam' , 'liam@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Bruna' , 'bruna@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Marcelo' , 'marcelo@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Chaves' , 'chaves@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Ursula' , 'ursula@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Pedro' , 'pedro@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Lucas' , 'lucas@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Jorge' , 'jorge@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Joao' , 'joao@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
+INSERT
+INTO users (username, email, password, "pictureUrl")
+VALUES ( 'Breno' , 'breno@teste.com' , '123456' , 'https://static.vecteezy.com/ti/vetor-gratis/p2/5228939-avatar-homem-rosto-silhueta-usuario-sinal-pessoa-perfil-imagem-masculino-icone-preto-cor-ilustracao-estilo-plano-imagem-vetor.jpg' );
