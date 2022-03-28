@@ -52,6 +52,7 @@ async function postPublication(req, res) {
 }
 
 async function getPublications(req, res) {
+  console.log("chegou");
   const authorization = req.headers.authorization;
   const token = authorization?.replace("Bearer ", "");
   if (!token) {
