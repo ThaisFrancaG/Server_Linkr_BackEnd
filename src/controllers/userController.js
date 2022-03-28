@@ -46,7 +46,8 @@ async function getUsers(req,res) {
     const { rows : users } = await connection.query(`
       SELECT id, username, "pictureUrl" 
       FROM users 
-      WHERE username LIKE $1`, [`${name}%`]);
+      WHERE username LIKE $1
+      LIMIT 3`, [`${name}%`]);
 
     return res.send(users)
   }catch(error) {
