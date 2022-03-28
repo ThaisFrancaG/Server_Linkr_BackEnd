@@ -68,7 +68,9 @@ async function getPublications(req, res) {
 
   try {
     let { rows: postList } = await connection.query(`
-		SELECT p.id,p.link, p.description, p."userId",
+	SELECT
+	  (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
+	  p.id,p.link, p.description, p."userId",
 		up."pictureUrl" AS "userPic",
 		un.username
 		FROM posts p
@@ -84,6 +86,11 @@ async function getPublications(req, res) {
     let detailedList = [];
 
     for (let i = 0; i < postList.length; i++) {
+      const { rows: checkLiked } = await connection.query(
+        `SELECT*FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
+        [postList[i].id, userId]
+      );
+
       let link = postList[i].link;
       let info = await urlMetadata(link);
       detailedList.push({
@@ -91,6 +98,7 @@ async function getPublications(req, res) {
         linkName: info.title,
         linkBanner: info.image,
         linkDesc: info.description,
+        likedByUser: checkLiked.length > 0 ? true : false,
       });
     }
     res.status(200).send(detailedList);
@@ -146,7 +154,6 @@ async function getUserPosts(req, res) {
 
     if (!detailedList.length) {
       detailedList.push({ username: userData.username });
-
     }
 
     return res.status(200).send(detailedList);
