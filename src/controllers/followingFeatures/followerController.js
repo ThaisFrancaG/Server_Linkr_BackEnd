@@ -1,26 +1,12 @@
 import { connection } from "../../db.js";
 
 async function toggleFollowing(req, res) {
-  const authorization = req.headers.authorization;
   const followUser = req.body.userId;
+  const { userId } = res.locals;
+  console.log(userId);
+  console.log(followUser);
 
   try {
-    const token = authorization?.replace("Bearer ", "");
-
-    if (!token) {
-      return res.sendStatus(401);
-    }
-
-    const { rows: checkUserId } = await connection.query(
-      `SELECT "userId" FROM sessions WHERE token=$1
-      `,
-      [token]
-    );
-
-    if (checkUserId.length === 0) {
-      return res.sendStatus(404);
-    }
-
     const { rows: checkFollowId } = await connection.query(
       `SELECT id FROM users WHERE id=$1`,
       [followUser]
@@ -28,7 +14,6 @@ async function toggleFollowing(req, res) {
     if (checkFollowId.length === 0) {
       return res.sendStatus(404);
     }
-    const userId = checkUserId[0].userId;
 
     const { rows: checkIfFollowing } = await connection.query(
       `SELECT * FROM followers WHERE "followerId"=$1 AND "followId" = $2`,
@@ -57,7 +42,12 @@ async function toggleFollowing(req, res) {
 }
 
 async function getFollowing(req, res) {
+  const { userId } = res.locals;
+  console.log(userId);
   try {
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
 }
 export { toggleFollowing, getFollowing };
