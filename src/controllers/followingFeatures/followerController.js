@@ -43,8 +43,21 @@ async function toggleFollowing(req, res) {
 
 async function getFollowing(req, res) {
   const { userId } = res.locals;
-  console.log(userId);
   try {
+    const { rows: userFollows } = await connection.query(
+      `
+    SELECT followers."followId" AS "FollowingId",
+    users.username
+    FROM followers 
+    JOIN users ON users.id=followers."followId"
+    WHERE "followerId"=$1
+    `,
+      [userId]
+    );
+
+    console.log(userFollows);
+
+    res.status(200).send(userFollows);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
