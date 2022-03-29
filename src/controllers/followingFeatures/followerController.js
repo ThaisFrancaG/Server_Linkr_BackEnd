@@ -3,8 +3,6 @@ import { connection } from "../../db.js";
 async function toggleFollowing(req, res) {
   const followUser = req.body.userId;
   const { userId } = res.locals;
-  console.log(userId);
-  console.log(followUser);
 
   try {
     const { rows: checkFollowId } = await connection.query(
@@ -54,8 +52,6 @@ async function getFollowing(req, res) {
     `,
       [userId]
     );
-
-    console.log(userFollows);
 
     res.status(200).send(userFollows);
   } catch (error) {
