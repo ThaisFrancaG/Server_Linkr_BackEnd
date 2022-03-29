@@ -21,6 +21,13 @@ async function toggleFollowing(req, res) {
       return res.sendStatus(404);
     }
 
+    const { rows: checkFollowId } = await connection.query(
+      `SELECT id FROM users WHERE id=$1`,
+      [followUser]
+    );
+    if (checkFollowId.length === 0) {
+      return res.sendStatus(404);
+    }
     const userId = checkUserId[0].userId;
 
     const { rows: checkIfFollowing } = await connection.query(
@@ -53,4 +60,4 @@ async function getFollowing(req, res) {
   try {
   } catch (error) {}
 }
-export { toggleFollowing };
+export { toggleFollowing, getFollowing };
