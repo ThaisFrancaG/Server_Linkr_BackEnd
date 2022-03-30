@@ -35,3 +35,10 @@ CREATE TABLE "hashtagPosts" (
 	"hashtagId" INTEGER NOT NULL REFERENCES hashtags(id),
 	"postId" INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE
 );
+
+CREATE TABLE followers (
+
+	id SERIAL PRIMARY KEY NOT NULL,
+	"followerId" INTEGER NOT NULL REFERENCES users(id),
+	"followId" INTEGER NOT NULL REFERENCES users(id)
+);
