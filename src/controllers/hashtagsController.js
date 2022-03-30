@@ -35,7 +35,6 @@ export async function getHashtags(req, res) {
     ORDER BY "hashtagCount" DESC
       LIMIT 10
 `);
-    console.log(hashtag);
     res.status(200).send(hashtag);
   } catch (error) {
     return res.status(500).send(error.message);

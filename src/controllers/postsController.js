@@ -146,7 +146,6 @@ async function getUserPosts(req, res) {
 
     if (!detailedList.length) {
       detailedList.push({ username: userData.username });
-
     }
 
     return res.status(200).send(detailedList);
