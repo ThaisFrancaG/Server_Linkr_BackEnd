@@ -7,12 +7,13 @@ import {
   updatePosts,
 } from "../controllers/postsController.js";
 import { validateSchema } from "../middleware/validateSchema.js";
+import validateUserToken from "../middleware/validateUser.js";
 import { postSchema } from "../schemas/postSchema.js";
 
 const postsRouter = Router();
 
 postsRouter.post("/publish", validateSchema(postSchema), postPublication);
-postsRouter.get("/timeline", getPublications);
+postsRouter.get("/timeline", validateUserToken, getPublications);
 postsRouter.get("/user/:id", getUserPosts);
 postsRouter.put("/post", validateSchema(postSchema), updatePosts);
 postsRouter.delete("/post/:id", validateSchema(postSchema), deletePost);

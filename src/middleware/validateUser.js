@@ -19,7 +19,7 @@ async function validateUserToken(req, res, next) {
   }
 
   const userId = checkUserId[0].userId;
-
+  console.log(userId);
   res.locals.userId = userId;
 
   next();

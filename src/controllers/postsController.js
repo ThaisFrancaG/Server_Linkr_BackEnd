@@ -53,21 +53,23 @@ async function postPublication(req, res) {
 
 async function getPublications(req, res) {
   const authorization = req.headers.authorization;
-  const token = authorization?.replace("Bearer ", "");
-  if (!token) {
-    return res.sendStatus(401);
-  }
-
-  const { rows: checkSession } = await connection.query(
-    `SELECT * FROM sessions WHERE token=$1
-      `,
-    [token]
-  );
-
-  const userId = checkSession[0].userId;
+  const { userId } = res.locals;
 
   try {
-    let { rows: postList } = await connection.query(`
+    let { rows: checkFollowing } = await connection.query(
+      `
+    SELECT * FROM followers WHERE "followerId"=$1
+    `,
+      [userId]
+    );
+    if (checkFollowing.length === 0) {
+      return res
+        .status(200)
+        .send("You don't follow anyone yet. Search for new friends!");
+    }
+
+    let { rows: postList } = await connection.query(
+      `
 	SELECT
 	  (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
 	  p.id,p.link, p.description, p."userId",
@@ -76,11 +78,15 @@ async function getPublications(req, res) {
 		FROM posts p
 		JOIN users up ON up.id=p."userId"
 		JOIN users un ON un.id=p."userId"
+		LEFT JOIN followers
+		ON p."userId"=followers."followId" WHERE followers."followerId"=$1
 		ORDER BY id DESC LIMIT 20
-		`);
+		`,
+      [userId]
+    );
 
     if (postList.length === 0) {
-      return res.status(200).send("There are no posts yet");
+      return res.status(200).send("No posts found from your friends");
     }
 
     let detailedList = [];
