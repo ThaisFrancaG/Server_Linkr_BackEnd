@@ -15,6 +15,6 @@ postsRouter.post("/publish", validateSchema(postSchema), postPublication);
 postsRouter.get("/timeline", getPublications);
 postsRouter.get("/user/:id", getUserPosts);
 postsRouter.put("/post", validateSchema(postSchema), updatePosts);
-postsRouter.delete("/post/:id", deletePost);
+postsRouter.delete("/post/:id", validateSchema(postSchema), deletePost);
 
 export default postsRouter;
