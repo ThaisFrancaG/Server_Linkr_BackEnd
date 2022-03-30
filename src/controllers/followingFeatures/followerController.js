@@ -44,7 +44,7 @@ async function getFollowing(req, res) {
   try {
     const { rows: userFollows } = await connection.query(
       `
-    SELECT followers."followId" AS "FollowingId",
+    SELECT followers."followId" AS "followingId",
     users.username
     FROM followers 
     JOIN users ON users.id=followers."followId"
