@@ -3,8 +3,7 @@ import { connection } from "../db.js";
 async function toggleLike(req, res) {
   const { postId } = req.body;
   const { userId } = res.locals;
-  console.log("chegou pro toggle");
-  console.log(userId);
+
   try {
     const { rows: liked } = await connection.query(
       `SELECT*FROM likes WHERE "postId"=$1 AND "likedById"=$2`,

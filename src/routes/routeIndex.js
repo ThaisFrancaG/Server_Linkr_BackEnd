@@ -1,4 +1,5 @@
 import { Router } from "express";
+import commentsRouter from "./commentsRoute.js";
 import followRouter from "./followingFeaturesRoutes/followRouter.js";
 import hashtagRouter from "./hashtagRouter.js";
 import logOutRouter from "./logOutRoute.js";
@@ -14,6 +15,7 @@ router.use(signUpRouter);
 router.use(logOutRouter);
 router.use(userRouter);
 router.use(postsRouter);
+router.use(commentsRouter);
 
 router.use(postLikesRouter);
 
