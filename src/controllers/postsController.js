@@ -70,6 +70,7 @@ async function getPublications(req, res) {
     let { rows: postList } = await connection.query(`
 	SELECT
 	  (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
+    (SELECT COUNT("postId") FROM comments WHERE "postId"=p.id) as comment_count,
 	  p.id,p.link, p.description, p."userId",
 		up."pictureUrl" AS "userPic",
 		un.username
