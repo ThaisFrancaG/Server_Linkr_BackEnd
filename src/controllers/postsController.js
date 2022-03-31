@@ -79,7 +79,7 @@ async function getPublications(req, res) {
 		JOIN users up ON up.id=p."userId"
 		JOIN users un ON un.id=p."userId"
 		LEFT JOIN followers
-		ON p."userId"=followers."followId" WHERE followers."followerId"=$1
+		ON p."userId"=followers."followId" WHERE followers."followerId"=$1 OR followers."followId"=$1
 		ORDER BY id DESC LIMIT 20
 		`,
       [userId]
