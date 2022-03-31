@@ -25,6 +25,18 @@ export async function signUp(req, res) {
       [email, passwordHash, username, pictureUrl]
     );
 
+    const { rows: newUser } = await connection.query(
+      `
+    SELECT id FROM users
+    WHERE email=$1`,
+      [email]
+    );
+
+    await connection.query(
+      `INSERT INTO followers ("followerId","followId") VALUES ($1,$2) `,
+      [newUser[0].id, newUser[0].id]
+    );
+
     res.sendStatus(201);
   } catch (error) {
     console.log(error);
