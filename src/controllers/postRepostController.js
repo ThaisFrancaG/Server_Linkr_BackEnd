@@ -1,7 +1,6 @@
 import { connection } from "../db.js";
 
 async function addRepost(req, res) {
-  console.log("chegou aqui");
   const postId = req.body.postId;
   const { userId } = res.locals;
 
@@ -35,11 +34,4 @@ async function addRepost(req, res) {
   }
 }
 
-async function getReposts(req, res) {
-  try {
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
-  }
-}
-export { addRepost, getReposts };
+export { addRepost };

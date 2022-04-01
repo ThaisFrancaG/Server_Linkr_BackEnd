@@ -73,14 +73,15 @@ async function getPublications(req, res) {
 	SELECT
 	  (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
     (SELECT COUNT("postId") FROM comments WHERE "postId"=p.id) as comment_count,
-	  p.id,p.link, p.description, p."userId",
+    (SELECT COUNT("postId") FROM reposts WHERE "postId"=p.id) as reposts_count,
+	  p.id,p.link, p.description, p."userId",p."isRepost",p."repostId",
 		up."pictureUrl" AS "userPic",
 		un.username
 		FROM posts p
 		JOIN users up ON up.id=p."userId"
 		JOIN users un ON un.id=p."userId"
 		LEFT JOIN followers
-		ON p."userId"=followers."followId" WHERE followers."followerId"=$1 OR followers."followId"=$1
+		ON p."userId"=followers."followId" OR p."repostId"=followers."followId" WHERE followers."followerId"=$1 OR followers."followId"=$1
 		ORDER BY id DESC LIMIT 20
 		`,
       [userId]
