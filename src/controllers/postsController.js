@@ -86,8 +86,6 @@ async function getPublications(req, res) {
 		`,
       [userId]
     );
-    console.log(userId);
-    console.log(postList);
     if (postList.length === 0) {
       return res.status(200).send("No posts found from your friends");
     }
