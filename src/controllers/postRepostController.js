@@ -23,11 +23,12 @@ async function addRepost(req, res) {
     );
     await connection.query(
       `
-			INSERT INTO reposts ("postId","originalPosterId","reposterId")
+			INSERT INTO reposts ("postId","originalPosterId","repostId")
 			VALUES ($1,$2,$3)
 		`,
       [postId, postInfo.userId, userId]
     );
+    return res.sendStatus(201)
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
