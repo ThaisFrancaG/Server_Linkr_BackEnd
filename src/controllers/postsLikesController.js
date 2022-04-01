@@ -1,8 +1,9 @@
 import { connection } from "../db.js";
 
 async function toggleLike(req, res) {
-  const { token, postId } = req.body;
+  const { postId } = req.body;
   const { userId } = res.locals;
+
   try {
     const { rows: liked } = await connection.query(
       `SELECT*FROM likes WHERE "postId"=$1 AND "likedById"=$2`,

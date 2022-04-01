@@ -43,13 +43,27 @@ async function getUsers(req,res) {
     );
     if (!session.rowCount) return res.sendStatus(401);
 
+    const user = session.rows[0];
+
+    const { rows : userFollows } = await connection.query(`
+      SELECT * FROM followers 
+      WHERE "followerId" = $1 AND "followerId" != "followId"`, [user.userId])
+
     const { rows : users } = await connection.query(`
       SELECT id, username, "pictureUrl" 
       FROM users 
       WHERE username LIKE $1
-      LIMIT 3`, [`${name}%`]);
+      `, [`${name}%`]);
 
-    return res.send(users)
+    const searchList = users.map(prof => ({
+      id: prof.id,
+      username: prof.username,
+      pictureUrl: prof.pictureUrl,
+      userFollows: userFollows.filter(fol => fol.followId === prof.id).length ? true : false
+    }))
+    searchList.sort((x ,y) => x.userFollows === y.userFollows ? 0 : x.userFollows ? -1 : 1);
+    
+    return res.send(searchList.slice(0,3))
   }catch(error) {
     return res.status(500).send(error);
   }

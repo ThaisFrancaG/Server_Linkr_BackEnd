@@ -72,19 +72,20 @@ async function getPublications(req, res) {
       `
 	SELECT
 	  (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
-	  p.id,p.link, p.description, p."userId",
+    (SELECT COUNT("postId") FROM comments WHERE "postId"=p.id) as comment_count,
+    (SELECT COUNT("postId") FROM reposts WHERE "postId"=p.id) as reposts_count,
+	  p.id,p.link, p.description, p."userId",p."isRepost",p."repostId",
 		up."pictureUrl" AS "userPic",
 		un.username
 		FROM posts p
 		JOIN users up ON up.id=p."userId"
 		JOIN users un ON un.id=p."userId"
 		LEFT JOIN followers
-		ON p."userId"=followers."followId" WHERE followers."followerId"=$1
+		ON p."userId"=followers."followId" OR p."repostId"=followers."followId" WHERE followers."followerId"=$1 OR followers."followId"=$1
 		ORDER BY id DESC LIMIT 20
 		`,
       [userId]
     );
-
     if (postList.length === 0) {
       return res.status(200).send("No posts found from your friends");
     }
@@ -134,20 +135,33 @@ async function getUserPosts(req, res) {
 
     const { rows: posts } = await connection.query(
       `
-			SELECT p.id,p.link, p.description, p."userId",
-			up."pictureUrl" AS "userPic",
-			un.username
-			FROM posts p
-			JOIN users up ON up.id=p."userId"
-			JOIN users un ON un.id=p."userId"
-			WHERE up.id = $1
+			SELECT
+      (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
+      (SELECT COUNT("postId") FROM comments WHERE "postId"=p.id) as comment_count,
+      p.id,p.link, p.description, p."userId",
+      up."pictureUrl" AS "userPic",
+      un.username
+      FROM posts p
+      JOIN users up ON up.id=p."userId"
+      JOIN users un ON un.id=p."userId"
+      WHERE up.id = $1
+      ORDER BY id DESC LIMIT 20
 		`,
       [userData.id]
     );
 
+    if (posts.length === 0) {
+      return res.status(200).send("No posts found");
+    }
+
     let detailedList = [];
 
     for (let i = 0; i < posts.length; i++) {
+      const { rows: checkLiked } = await connection.query(
+        `SELECT * FROM likes WHERE "postId"=$1 AND "likedById"=$2`,
+        [posts[i].id, userData.id]
+      );
+
       let link = posts[i].link;
       let info = await urlMetadata(link);
       detailedList.push({
@@ -155,9 +169,9 @@ async function getUserPosts(req, res) {
         linkName: info.title,
         linkBanner: info.image,
         linkDesc: info.description,
+        likedByUser: checkLiked.length > 0 ? true : false,
       });
     }
-
     if (!detailedList.length) {
       detailedList.push({ username: userData.username });
     }
