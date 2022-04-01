@@ -55,5 +55,6 @@ CREATE TABLE reposts (
 id SERIAL PRIMARY KEY NOT NULL,
 "postId" INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
 "originalPosterId" INTEGER NOT NULL REFERENCES users(id),
-"repostId" INTEGER NOT NULL REFERENCES users(id)
+"repostId" INTEGER NOT NULL REFERENCES users(id),
+"repostUsername" TEXT NOT NULL
 );
