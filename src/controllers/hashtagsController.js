@@ -6,10 +6,23 @@ export default async function getHashtagPosts(req, res) {
   try {
     const result = await connection.query(
       `
-    SELECT * FROM posts
-      JOIN "hashtagPosts" ON "hashtagPosts"."postId"=posts.id
-      JOIN hashtags ON hashtags.id="hashtagPosts"."hashtagId"
-    WHERE hashtags.tag=$1`,
+      SELECT DISTINCT ON (p.id) p.id,
+      (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
+      (SELECT COUNT("postId") FROM comments WHERE "postId"=p.id) as comment_count,
+      (SELECT COUNT("postId") FROM reposts WHERE "postId"=p.id) as reposts_count,
+      p.link, p.description, p."userId",p."isRepost",p."repostId", p."repostUsername",
+      up."pictureUrl" AS "userPic",
+      un.username
+      FROM posts p
+      JOIN users up ON up.id=p."userId"
+      JOIN users un ON un.id=p."userId"
+      JOIN "hashtagPosts" hp ON hp."postId"=p.id
+      JOIN hashtags h ON h.id="hp."hashtagId"
+      LEFT JOIN followers
+      ON p."userId"=followers."followId" OR p."repostId"=followers."followId" 
+      WHERE h.tag=$1
+      ORDER BY p.id DESC LIMIT 20
+      `,
       [hashtag]
     );
     if (result.rowCount === 0) {
