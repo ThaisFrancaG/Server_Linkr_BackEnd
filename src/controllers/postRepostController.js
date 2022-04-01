@@ -4,8 +4,6 @@ async function addRepost(req, res) {
   console.log("chegou aqui");
   const postId = req.body.postId;
   const { userId } = res.locals;
-  console.log(postId);
-  console.log(userId);
 
   try {
     const { rows: checkPost } = await connection.query(
@@ -24,9 +22,24 @@ async function addRepost(req, res) {
 		`,
       [postInfo.link, postInfo.description, postInfo.userId, true, userId]
     );
+    await connection.query(
+      `
+			INSERT INTO reposts ("postId","originalPosterId","reposterId")
+			VALUES ($1,$2,$3)
+		`,
+      [postId, postInfo.userId, userId]
+    );
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
   }
 }
-export { addRepost };
+
+async function getReposts(req, res) {
+  try {
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+export { addRepost, getReposts };

@@ -16,7 +16,9 @@ CREATE TABLE posts (
 	id SERIAL PRIMARY KEY NOT NULL,
 	link TEXT NOT NULL,
 	description TEXT NULL,
-	"userId" INTEGER NOT NULL REFERENCES users(id)
+	"userId" INTEGER NOT NULL REFERENCES users(id),
+	"isRepost" BOOLEAN DEFAULT false,
+	"repostId" INTEGER REFERENCES users(id)
 );
 
 CREATE TABLE likes (
@@ -47,4 +49,11 @@ CREATE TABLE comments (
 	comment TEXT NOT NULL,
 	"usersId" INTEGER NOT NULL REFERENCES users(id),
 	"postId" INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE reposts (
+id SERIAL PRIMARY KEY NOT NULL,
+"postId" INTEGER NOT NULL REFERENCES posts(id),
+"originalPosterId" INTEGER NOT NULL REFERENCES users(id),
+"reposterId" INTEGER NOT NULL REFERENCES users(id)
 );
