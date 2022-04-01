@@ -56,5 +56,5 @@ id SERIAL PRIMARY KEY NOT NULL,
 "postId" INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
 "originalPosterId" INTEGER NOT NULL REFERENCES users(id),
 "repostId" INTEGER NOT NULL REFERENCES users(id),
-"respostUsername" TEXT NOT NULL
+"repostUsername" TEXT NOT NULL
 );
