@@ -14,7 +14,7 @@ async function addRepost(req, res) {
     }
     const postInfo = checkPost[0];
 
-    const { rows : user} = await connection.query(`SELECT usename FROM users WHERE id = $1`, [userId])
+    const { rows : user} = await connection.query(`SELECT username FROM users WHERE id = $1`, [userId])
 
     await connection.query(
       `
