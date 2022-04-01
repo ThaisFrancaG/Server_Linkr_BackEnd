@@ -14,6 +14,8 @@ async function addRepost(req, res) {
     }
     const postInfo = checkPost[0];
 
+    const { rows : user} = await connection.query(`SELECT usename FROM users WHERE id = $1`, [userId])
+
     await connection.query(
       `
 			INSERT INTO posts (link, description, "userId", "isRepost","repostId")
@@ -23,10 +25,10 @@ async function addRepost(req, res) {
     );
     await connection.query(
       `
-			INSERT INTO reposts ("postId","originalPosterId","repostId")
-			VALUES ($1,$2,$3)
+			INSERT INTO reposts ("postId","originalPosterId","repostId", "respostUsername")
+			VALUES ($1,$2,$3, $4)
 		`,
-      [postId, postInfo.userId, userId]
+      [postId, postInfo.userId, userId, user.username]
     );
     return res.sendStatus(201)
   } catch (error) {
