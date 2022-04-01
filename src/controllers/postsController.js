@@ -74,7 +74,7 @@ async function getPublications(req, res) {
 	  (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
     (SELECT COUNT("postId") FROM comments WHERE "postId"=p.id) as comment_count,
     (SELECT COUNT("postId") FROM reposts WHERE "postId"=p.id) as reposts_count,
-	  p.link, p.description, p."userId",p."isRepost",p."repostId",
+	  p.link, p.description, p."userId",p."isRepost",p."repostId", p."repostUsername",
 		up."pictureUrl" AS "userPic",
 		un.username
 		FROM posts p
