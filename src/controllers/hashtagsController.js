@@ -15,6 +15,7 @@ export default async function getHashtagPosts(req, res) {
     if (result.rowCount === 0) {
       return res.sendStatus(404);
     }
+    console.log(result.rows);
 
     res.status(200).send(result.rows);
   } catch (error) {
