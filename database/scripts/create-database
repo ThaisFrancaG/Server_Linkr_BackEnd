@@ -18,7 +18,8 @@ CREATE TABLE posts (
 	description TEXT NULL,
 	"userId" INTEGER NOT NULL REFERENCES users(id),
 	"isRepost" BOOLEAN DEFAULT false,
-	"repostId" INTEGER REFERENCES users(id)
+	"repostId" INTEGER REFERENCES users(id),
+	"repostUsername" TEXT NULL
 );
 
 CREATE TABLE likes (
