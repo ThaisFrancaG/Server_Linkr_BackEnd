@@ -1,10 +1,11 @@
+import urlMetadata from "url-metadata";
 import { connection } from "../db.js";
 
 export default async function getHashtagPosts(req, res) {
   const { hashtag } = req.params;
 
   try {
-    const result = await connection.query(
+    let { rows: result } = await connection.query(
       `
       SELECT DISTINCT ON (p.id) p.id,
       (SELECT COUNT("postId") FROM likes WHERE "postId"=p.id) as likes_count,
@@ -17,7 +18,7 @@ export default async function getHashtagPosts(req, res) {
       JOIN users up ON up.id=p."userId"
       JOIN users un ON un.id=p."userId"
       JOIN "hashtagPosts" hp ON hp."postId"=p.id
-      JOIN hashtags h ON h.id="hp."hashtagId"
+      JOIN hashtags h ON h.id=hp."hashtagId"
       LEFT JOIN followers
       ON p."userId"=followers."followId" OR p."repostId"=followers."followId" 
       WHERE h.tag=$1
@@ -25,12 +26,30 @@ export default async function getHashtagPosts(req, res) {
       `,
       [hashtag]
     );
-    if (result.rowCount === 0) {
-      return res.sendStatus(404);
+    if (result.length === 0) {
+      return res.status(404).send("No posts found");
     }
-    console.log(result.rows);
 
-    res.status(200).send(result.rows);
+    let detailedList = [];
+
+    for (let i = 0; i < result.length; i++) {
+      const { rows: checkLiked } = await connection.query(
+        `SELECT*FROM likes WHERE "postId"=$1`,
+        [result[i].id]
+      );
+
+      let link = result[i].link;
+      let info = await urlMetadata(link);
+      detailedList.push({
+        ...result[i],
+        linkName: info.title,
+        linkBanner: info.image,
+        linkDesc: info.description,
+        likedByUser: checkLiked.length > 0 ? true : false,
+      });
+    }
+
+    res.status(200).send(detailedList);
   } catch (error) {
     return res.status(500).send(error.message);
   }
